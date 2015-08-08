@@ -1,0 +1,15 @@
+#pragma once
+
+namespace Sudoku
+{
+	enum LEVEL : unsigned {EASY = 0, MEDIUM = 1, HARD = 2, SAMURAI = 3, INVALID = 99};
+	#define GAME_SIZE 81
+	enum WATER_MARK {LEVEL0 = 10000, LEVEL1 = 20000, LEVEL2 = 40000};
+	enum CHECKPOINT {
+		VALIDLOWERBOUND = 18,
+		CHECKPOINT_EASY = 45,
+		CHECKPOINT_MEDIUM = 53,
+		CHECKPOINT_HARD = 57,
+		VALIDUPPERBOUND = 64
+	};
+}

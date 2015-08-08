@@ -1,0 +1,10 @@
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\bin\Debug\WindowsFormsExample.exe.config
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\bin\Debug\WindowsFormsExample.exe
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\bin\Debug\WindowsFormsExample.pdb
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\obj\Debug\WindowsFormsExample.Properties.Resources.resources
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\obj\Debug\WindowsFormsExample.csproj.GenerateResource.Cache
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\obj\Debug\WindowsFormsExample.exe
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\obj\Debug\WindowsFormsExample.pdb
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\obj\Debug\WindowsFormsExample.SudokuMainWindow.resources
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\bin\Debug\SudokuCLRDLL.dll
+C:\Work\CSharp_Fun\PeterPanCSharp\WindowsFormsExample\bin\Debug\SudokuCLRDLL.pdb
