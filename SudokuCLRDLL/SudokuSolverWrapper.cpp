@@ -45,8 +45,24 @@
 		}
 	}
 
-	String ^ Sudoku::SudokuSolverWrapper::generateGame(int level) {
-		return "";
+	String ^ Sudoku::SudokuSolverWrapper::generateGame(int difficulty) {
+		
+		LEVEL level;
+		switch (difficulty) {
+		case 0: level = EASY; break;
+		case 1: level = MEDIUM; break;
+		case 2: level = HARD; break;
+		case 3: level = SAMURAI; break;
+		default: level = EASY; break;
+		}
+
+		SudokuSolverEngine sudokuSolver;	
+		vector<int> game = sudokuSolver.generateGame(level);
+		string output;
+		for (int i = 0; i < 81; i++) {
+			output.append(std::to_string(game.at(i)));
+		}
+		return msclr::interop::marshal_as<String^>(output);
 	}
 
 	String ^ Sudoku::SudokuSolverWrapper::solveGame(String ^ game) {

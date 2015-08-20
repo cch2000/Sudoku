@@ -4,6 +4,13 @@
 
 namespace Sudoku
 {
+	static std::string easy_template = "51.....838..416..5..........985.461....9.1....642.357..........6..157..478.....96";
+	static std::string medium_template = "7...9...32..468..1..8...6...4..2..9....3.4....8..1..3...9...7..5..142..68...5...2";
+	static std::string hard_template = ".523..6..6...4...3............63..1.47.....35.2..58............1...9...6..5..172.";
+	static std::string samurai_template = "5.....1.7..43..5.....2...8..9.4.2...4.......6...1.3.5..8...4.....2..67..3.9.....1";
+	
+	typedef void(*pfunc)(vector<int>& puzzle);
+
 	std::vector<int> permute9Array() {
 		srand(time(NULL));
 		int values[9] = { 1,2,3,4,5,6,7,8,9 };
@@ -17,6 +24,48 @@ namespace Sudoku
 		}
 		return numbers;
 	}
+
+	void rotateVertical(vector<int> & game) {
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 9; j++) {
+				int up = i * 9 + j;
+				int down = (8 - i) * 9 + j;
+				std::swap(game.begin() + up, game.begin() + down);
+			}
+		}
+	}
+
+	void rotateHorizontal(vector<int> & game) {
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 4; j++) {
+				int left = i * 9 + j;
+				int right = i * 9 + (8 - j);
+				std::swap(game.begin() + left, game.begin() + right);
+			}
+		}
+	}
+
+	void rotateMajorDiagonal(vector<int> & game) {
+		for (int i = 0; i < 9; i++) {
+			for (int j = i + 1; j < 9; j++) {
+				int upperRight = i * 9 + j;
+				int lowerLeft = j * 9 + j;
+				std::swap(game.begin() + upperRight, game.begin() + lowerLeft);
+			}
+		}
+	}
+
+	void rotateMinorDiagonal(vector<int> & game) {
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < i; j++) {
+				int upperLeft = i * 9 + j;
+				int LowerRight = (8 - j) * 9 + (8 - i);
+				std::swap(game.begin() + upperLeft, game.begin() + LowerRight);
+			}
+		}
+	}
+
 	void SudokuSolverEngine::reduceSquaresInRow(int row, int col, int value, map<int, set<int>>& _choices) {
 		for (int j = 0; j < 9; j++) {
 			if (j != col && choices.find(row * 9 + j) != choices.end()) {
@@ -141,7 +190,7 @@ namespace Sudoku
 		_squares = game;
 		init();
 	}
-	SudokuSolverEngine::SudokuSolverEngine(const string & origin, bool _reverse) : reverse(_reverse) {
+	SudokuSolverEngine::SudokuSolverEngine(const string & origin, bool _reverse) : reverse(_reverse){
 		string2IntArray(origin);
 		init();
 	}
@@ -161,71 +210,48 @@ namespace Sudoku
 			std::cout << std::endl;
 		}
 	}
-	std::vector<int> SudokuSolverEngine::generateGame(LEVEL level) {
-		std::vector<int> game;
-		std::vector<int> row1 = permute9Array();
-		game.assign(row1.begin(), row1.end());
-		game.insert(game.end(), 72, 0);
-		for (int k = 0; k < 8; k++) {
-			for (int m = 0; m < 9;) {
-				bool found = false;
-				int value = game[(k + 1) * 9 + m];
-				value++;
-				while (!found && value <= 9) {
-					if (isSafe(k + 1, m, value, -1, game)) {
-						found = true;
-						game[(k + 1) * 9 + m] = value;
-						m++;
-					}
-					else {
-						value++;
-					}
-				}
-				if (!found) {
-					game[(k + 1) * 9 + m] = 0;
-					m--;
-				}
-			}
-		}
-		int numToFill = this->genNumToFill(level);
-		std::set<int> indices;
-		for (int i = 0; i < GAME_SIZE; i++) {
-			indices.insert(i);
+	std::vector<int> SudokuSolverEngine::generateGame(LEVEL difficulty) {
+		static std::map<LEVEL, std::string> templateMap;
+		templateMap[EASY] = easy_template;
+		templateMap[MEDIUM] = medium_template;
+		templateMap[HARD] = hard_template;
+		templateMap[SAMURAI] = samurai_template;
+		level = difficulty;
+		string2IntArray(templateMap[difficulty]);
+		std::vector<int> row = permute9Array();
+		std::map<int, int> swapMap;
+		int id = 1;
+		for each (int num in row)
+		{
+			swapMap[id] = num;
+			id++;
 		}
 
-		LEVEL target_level;
-
-		int start = 0;
-		int progress = rand() % indices.size();
-		while ((start < numToFill) || (target_level < level)) {
-			set<int>::const_iterator it(indices.begin());
-			advance(it, progress);
-			int oldValue = game[*it];
-			game[*it] = 0;
-			bool toRevert = true;
-			SudokuSolverEngine solver1(game, false);
-			if (solver1.checkIfHasSolution()) {
-				solver1.Solve();
-				toRevert = solver1.findSecondSolution();
-			}
-			else {
-				toRevert = true;
-			}
-
-			if (!toRevert) {
-				indices.erase(it);
-				start++;
-				target_level = solver1.getLEVEL();
-			}
-			else {
-				game[*it] = oldValue;
-			}
-			progress = (progress + 1) % indices.size();
+		
+		for (auto iter = squares.begin(); iter < squares.end(); iter++)
+		{
+			*iter = swapMap[*iter];
 		}
-		std::cout << start << " numbers to fill" << std::endl;
-		SudokuSolverEngine solver0(game, false);
-		solver0.Solve();
-		return game;
+
+		printSolution();
+		int transformations[] = { 0,1,2,3 };
+		std::vector<int> transform(transformations, transformations + 4);
+		map<int, pfunc> funcMap;
+		funcMap[0] = rotateVertical;
+		funcMap[1] = rotateHorizontal;
+		funcMap[2] = rotateMajorDiagonal;
+		funcMap[3] = rotateMinorDiagonal;
+
+		srand(time(NULL));
+		int trans_id = rand() % 4;
+		for (int i = 0; i < 64; i++) {
+			pfunc f = funcMap[transform[trans_id]];
+			(*f)(squares);
+			std::swap(transform.begin() + 3, transform.begin() + trans_id);
+			trans_id = rand() % 3;
+		}
+		//init();
+		return squares;
 	}
 
 	int SudokuSolverEngine::genNumToFill(LEVEL level) {

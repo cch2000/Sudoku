@@ -28,9 +28,11 @@ namespace WindowsFormsExample
 
         private void On_changeButton_Click(object sender, System.EventArgs e)
         {
-            List<int> numbers = SudukuGenerator.CreateNew();
+            //List<int> numbers = SudukuGenerator.CreateNew();
+            var text = SudokuSolver.generateGame(gameLevel);
+            gameToSolve = text;
+            List<int> numbers = SudukuGenerator.ImportNew(text);
             updateSudokuBoard(numbers);
-            this.gameToSolve = String.Empty;
             this.Invalidate();
         }
 
@@ -74,6 +76,7 @@ namespace WindowsFormsExample
                     text = Regex.Replace(text, @"\s+|\t|\n|\r", "");
                     gameToSolve = text;
                     updateSudokuBoard(SudukuGenerator.ImportNew(text));
+                    gameLevel = -1;
                     this.Invalidate();
                 }
                 catch (Exception exp)
@@ -106,7 +109,7 @@ namespace WindowsFormsExample
         {
             if (!gameToSolve.Equals(String.Empty))
             {
-                var level = SudokuSolver.getGameLevel(gameToSolve);
+                var level = gameLevel > 0 ? gameLevel : SudokuSolver.getGameLevel(gameToSolve);
                 var message = String.Format("Difficulty level: {0}.", this.levelMap[level]);
                 MessageBox.Show(message, "Puzzle info");
             }
@@ -120,6 +123,15 @@ namespace WindowsFormsExample
                 var message = String.Format("{0}", isUnique ? "This is a valid puzzle" : 
                                             @"This puzzle has more than one solution!!!\n Invalid");
                 MessageBox.Show(message, "Validate Puzzle");
+            }
+        }
+
+        private void On_CheckedChanged(object sender, System.EventArgs e)
+        {
+            for(var i = 0; i < gameLevelButtons.Count; i++)
+            {
+                if (gameLevelButtons[i].Checked)
+                    gameLevel = i;
             }
         }
 
@@ -194,6 +206,23 @@ namespace WindowsFormsExample
             this.Controls.Add(this.validateButton);
         }
 
+        private void createGameLevelRadioButtons()
+        {
+            gameLevelButtons = new List<RadioButton>();
+            RadioButton radioButton;
+            String[] tags = { "easy", "medium", "hard", "samurai" };
+            for (int i = 0; i < tags.Length; ++i)
+            {
+                radioButton = new RadioButton();
+                radioButton.Text = tags[i];
+                radioButton.CheckedChanged += On_CheckedChanged;
+                radioButton.Location = new System.Drawing.Point(
+                    480, 370 + i * 20);
+                gameLevelButtons.Add(radioButton);
+                this.Controls.Add(radioButton);
+            }
+        }
+
         private void updateSudokuBoard(List<int> input)
         {
             for (int i = 0; i < 81; i++)
@@ -259,7 +288,11 @@ namespace WindowsFormsExample
             // 
             // SudokuMainWindow
             //
-            List<int> numbers = SudukuGenerator.CreateNew();
+            //List<int> numbers = SudukuGenerator.CreateNew();
+            gameLevel = 1;
+            var text = SudokuSolver.generateGame(gameLevel);
+            gameToSolve = text;
+            List<int> numbers = SudukuGenerator.ImportNew(text);
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(500, 500);
@@ -273,6 +306,8 @@ namespace WindowsFormsExample
             createSolveButton();
             createInfoButton();
             createValidateButton();
+            createGameLevelRadioButtons();
+            this.gameLevelButtons[gameLevel].Checked = true;
             this.PerformLayout();
             this.existingValues = numbers;
         }
@@ -286,9 +321,11 @@ namespace WindowsFormsExample
         private Button solveButton;
         private Button infoButton;
         private Button validateButton;
+        private List<RadioButton> gameLevelButtons;
 
         private List<int> existingValues;
         private String gameToSolve;
+        private int gameLevel;
         private readonly Dictionary<int, String> levelMap = new Dictionary<int, String>
         {
             {0, "Easy"},

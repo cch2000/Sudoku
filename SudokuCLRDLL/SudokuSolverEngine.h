@@ -53,10 +53,8 @@ namespace Sudoku {
 		void Solve();
 		void Solve(bool filterUsedValue, const vector<int> &  oldSolution);
 		std::vector<int> getSolution() const;
-		//bool isSolutionEqual(const SudokuSolverEngine solver) const;
 		void printSolution();
 		vector<int> generateGame(LEVEL level);
-		//bool hasUqniueSolution();
 		LEVEL getLEVEL() const { return this->level; }
 		bool findSecondSolution();
 	};
